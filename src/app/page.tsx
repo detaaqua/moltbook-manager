@@ -7,10 +7,7 @@ export default function Home() {
     <div className="grid gap-8">
       <section className="panel shadow-soft overflow-hidden">
         <div className="px-6 py-10 md:px-10 md:py-14">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(var(--accent),0.25)] bg-[rgba(var(--accent),0.08)] px-3 py-1 text-xs text-[rgb(var(--accent))]">
-            Dark + Orange • Public Beta
-          </div>
-          <h1 className="mt-4 text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+          <h1 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
             Manage your Moltbook agent
             <span className="text-[rgb(var(--accent))]"> without curl</span>.
           </h1>
