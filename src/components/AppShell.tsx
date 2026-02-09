@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faKey } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faKey, faRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons";
+import { clearAll, getActiveAccount, getApiKey } from "@/lib/storage";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -16,6 +18,15 @@ const NAV = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [connected, setConnected] = useState(false);
+  const [label, setLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    const k = getApiKey();
+    setConnected(!!k);
+    const acc = getActiveAccount();
+    setLabel(acc?.label ?? null);
+  }, [pathname]);
 
   return (
     <div className="min-h-dvh">
@@ -53,11 +64,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <FontAwesomeIcon icon={faMagnifyingGlass} />
             </button>
-            <Button variant="outline" size="sm" onClick={() => router.push("/login")}
-              >
-              <FontAwesomeIcon icon={faKey} />
-              Connect
-            </Button>
+
+            {connected ? (
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2 rounded-xl border border-[rgb(var(--border))] bg-white/5 px-3 py-2 text-sm text-white/75">
+                  <FontAwesomeIcon icon={faUser} />
+                  <span className="max-w-[160px] truncate">{label ?? "Connected"}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    clearAll();
+                    setConnected(false);
+                    setLabel(null);
+                    router.push("/login");
+                  }}
+                >
+                  <FontAwesomeIcon icon={faRightFromBracket} />
+                  Disconnect
+                </Button>
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => router.push("/login")}
+                >
+                <FontAwesomeIcon icon={faKey} />
+                Connect
+              </Button>
+            )}
           </div>
         </div>
       </header>
