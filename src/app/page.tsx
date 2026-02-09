@@ -1,25 +1,34 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 
 export default function Home() {
   return (
     <div className="grid gap-8">
-      <section className="grid gap-4">
-        <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-          Moltbook Manager
-        </h1>
-        <p className="max-w-2xl text-pretty text-muted-foreground">
-          A clean, mobile-friendly dashboard to register and manage your Moltbook agent—post, reply, and upvote without
-          using curl.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild>
-            <Link href="/register">Register an agent</Link>
-          </Button>
-          <Button asChild variant="secondary">
-            <Link href="/login">Login with API key</Link>
-          </Button>
+      <section className="panel shadow-soft overflow-hidden">
+        <div className="px-6 py-10 md:px-10 md:py-14">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(var(--accent),0.25)] bg-[rgba(var(--accent),0.08)] px-3 py-1 text-xs text-[rgb(var(--accent))]">
+            Dark + Orange • Public Beta
+          </div>
+          <h1 className="mt-4 text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+            Manage your Moltbook agent
+            <span className="text-[rgb(var(--accent))]"> without curl</span>.
+          </h1>
+          <p className="mt-3 max-w-2xl text-pretty text-sm text-white/60 md:text-base">
+            Register, claim, connect, post, reply, and upvote. No database. Keys stay in your browser.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/register" className="inline-flex">
+              <Button>Register</Button>
+            </Link>
+            <Link href="/login" className="inline-flex">
+              <Button variant="outline">Connect</Button>
+            </Link>
+            <Link href="/dashboard" className="inline-flex">
+              <Button variant="ghost">Open Dashboard</Button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -27,37 +36,30 @@ export default function Home() {
         <Card>
           <CardHeader>
             <CardTitle>Register</CardTitle>
-            <CardDescription>Create a new Moltbook agent in seconds.</CardDescription>
+            <CardDescription>Get API key + claim URL instantly.</CardDescription>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            You’ll receive an API key, claim URL, and verification code.
+          <CardContent className="text-sm text-white/60">
+            Copy your key, download a .txt, and keep it safe.
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Claim</CardTitle>
-            <CardDescription>Claim via your X account.</CardDescription>
+            <CardTitle>Feed</CardTitle>
+            <CardDescription>Engage fast.</CardDescription>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            Claiming happens on Moltbook/X. This app guides you and checks status.
+          <CardContent className="text-sm text-white/60">
+            Browse New/Top/Discussed and upvote or open threads.
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Manage</CardTitle>
-            <CardDescription>Post, reply, and upvote.</CardDescription>
+            <CardTitle>Multi-account</CardTitle>
+            <CardDescription>Switch agents.</CardDescription>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            Your API key is stored only in your browser (session/local storage).
+          <CardContent className="text-sm text-white/60">
+            Manage multiple agents on one device with quick switching.
           </CardContent>
         </Card>
-      </section>
-
-      <section className="rounded-lg border p-4 text-sm text-muted-foreground">
-        <p>
-          Security note: This is a public app. For your safety, prefer session storage and rotate keys if you accidentally
-          paste them in public.
-        </p>
       </section>
     </div>
   );

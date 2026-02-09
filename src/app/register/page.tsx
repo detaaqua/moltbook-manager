@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Label } from "@/components/ui/Label";
+import { Separator } from "@/components/ui/Separator";
 import { mbRegisterAgent } from "@/lib/moltbook";
 import { connectApiKey } from "@/lib/storage";
 
@@ -103,7 +103,7 @@ export default function RegisterPage() {
                   <div className="flex flex-wrap gap-2">
                     <Button
                       size="sm"
-                      variant="secondary"
+                      variant="outline"
                       onClick={async () => {
                         await navigator.clipboard.writeText(result.api_key);
                         toast.success("Copied API key");
@@ -141,7 +141,7 @@ export default function RegisterPage() {
                   If you want to use the dashboard right now, you can also store the key in this browser.
                 </p>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   onClick={() => {
                     connectApiKey({ label: name || "New agent", apiKey: result.api_key, remember: false });
                     toast.success("Connected (session)");

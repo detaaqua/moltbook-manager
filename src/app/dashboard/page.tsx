@@ -2,14 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUp, faCommentDots, faPenToSquare, faRotateRight } from "@fortawesome/free-solid-svg-icons";
+
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import {
   mbCreateComment,
   mbCreatePost,
@@ -25,10 +24,12 @@ export default function DashboardPage() {
   const router = useRouter();
   const [apiKey, setKey] = useState<string | null>(null);
 
+  const [view, setView] = useState<"feed" | "thread" | "create">("feed");
+
   const [status, setStatus] = useState<Awaited<ReturnType<typeof mbStatus>> | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(false);
 
-  const [sort, setSort] = useState<"hot" | "new" | "top" | "rising">("hot");
+  const [sort, setSort] = useState<"hot" | "new" | "top" | "rising">("new");
   const [posts, setPosts] = useState<NonNullable<Awaited<ReturnType<typeof mbListPosts>>["posts"]>>([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
 
@@ -50,7 +51,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const k = getApiKey();
     if (!k) {
-      toast.error("Please connect an API key first");
       router.push("/login");
       return;
     }
@@ -63,9 +63,6 @@ export default function DashboardPage() {
     try {
       const s = await mbStatus(apiKey);
       setStatus(s);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to fetch status";
-      toast.error(msg);
     } finally {
       setLoadingStatus(false);
     }
@@ -75,11 +72,8 @@ export default function DashboardPage() {
     if (!apiKey) return;
     setLoadingPosts(true);
     try {
-      const res = await mbListPosts(apiKey, { sort, limit: 10 });
+      const res = await mbListPosts(apiKey, { sort, limit: 15 });
       setPosts(res.posts ?? []);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to load feed";
-      toast.error(msg);
     } finally {
       setLoadingPosts(false);
     }
@@ -92,11 +86,9 @@ export default function DashboardPage() {
       setSelectedPostId(postId);
       const p = await mbGetPost(apiKey, postId);
       setSelectedPost(p.post ?? null);
-      const c = await mbListComments(apiKey, postId, { sort: "new", limit: 25 });
+      const c = await mbListComments(apiKey, postId, { sort: "new", limit: 50 });
       setComments(c.comments ?? []);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to load thread";
-      toast.error(msg);
+      setView("thread");
     } finally {
       setLoadingThread(false);
     }
@@ -113,112 +105,59 @@ export default function DashboardPage() {
     refreshPosts();
   }, [sort]);
 
-  const statusBadge = useMemo(() => {
+  const statusText = useMemo(() => {
     const s = status?.status;
-    if (!s) return <Badge variant="secondary">Unknown</Badge>;
-    if (s === "claimed") return <Badge>Claimed</Badge>;
-    if (s === "pending_claim") return <Badge variant="secondary">Pending claim</Badge>;
-    return <Badge variant="outline">{String(s)}</Badge>;
+    if (!s) return "Unknown";
+    if (s === "claimed") return "Verified";
+    if (s === "pending_claim") return "Pending Claim";
+    return String(s);
   }, [status]);
 
   if (!apiKey) return null;
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Dashboard</h2>
-          <p className="text-sm text-muted-foreground">Manage your agent: status, posting, and engagement.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+          <p className="text-sm text-white/60">Dark + orange UI. Feed-first, Moltbook-inspired layout.</p>
         </div>
+
         <div className="flex flex-wrap items-center gap-2">
-          {statusBadge}
-          <Button size="sm" variant="outline" onClick={refreshStatus} disabled={loadingStatus}>
-            {loadingStatus ? "Refreshing…" : "Refresh status"}
+          <span className="rounded-full border border-[rgb(var(--border))] bg-white/5 px-3 py-1 text-xs text-white/70">
+            Status: {statusText}
+          </span>
+          <Button variant="outline" size="sm" onClick={refreshStatus} disabled={loadingStatus}>
+            <FontAwesomeIcon icon={faRotateRight} />
+            Refresh
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="feed" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-neutral-900/60">
-          <TabsTrigger value="feed">Posts</TabsTrigger>
-          <TabsTrigger value="thread">Comments</TabsTrigger>
-          <TabsTrigger value="compose">Create</TabsTrigger>
-        </TabsList>
+      <div className="flex flex-wrap gap-2">
+        <Button variant={view === "feed" ? "primary" : "outline"} size="sm" onClick={() => setView("feed")}> 
+          <FontAwesomeIcon icon={faArrowUp} /> Posts
+        </Button>
+        <Button
+          variant={view === "thread" ? "primary" : "outline"}
+          size="sm"
+          onClick={() => setView("thread")}
+          disabled={!selectedPostId}
+        >
+          <FontAwesomeIcon icon={faCommentDots} /> Comments
+        </Button>
+        <Button variant={view === "create" ? "primary" : "outline"} size="sm" onClick={() => setView("create")}>
+          <FontAwesomeIcon icon={faPenToSquare} /> Create
+        </Button>
+      </div>
 
-        <TabsContent value="compose" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Create a post</CardTitle>
-              <CardDescription>Respect Moltbook cooldowns to avoid anti-spam verification.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2 md:grid-cols-2">
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium">Submolt</label>
-                  <Input value={submolt} onChange={(e) => setSubmolt(e.target.value)} placeholder="general" />
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium">URL (optional)</label>
-                  <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://" />
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">Title</label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="A useful update…" />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">Content</label>
-                <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Write something…" />
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={async () => {
-                    if (!title.trim()) return toast.error("Title is required");
-                    if (!content.trim() && !url.trim()) return toast.error("Content or URL is required");
-                    setPosting(true);
-                    try {
-                      const res = await mbCreatePost(apiKey, {
-                        submolt: submolt.trim() || "general",
-                        title: title.trim(),
-                        content: content.trim() || undefined,
-                        url: url.trim() || undefined,
-                      });
-                      if (res?.success === false) {
-                        toast.error(res?.error || res?.message || "Failed");
-                      } else {
-                        toast.success(res?.message || "Created");
-                        setTitle("");
-                        setContent("");
-                        setUrl("");
-                        refreshPosts();
-                      }
-                    } catch (e: unknown) {
-                      const msg = e instanceof Error ? e.message : "Request failed";
-                      toast.error(msg);
-                    } finally {
-                      setPosting(false);
-                    }
-                  }}
-                  disabled={posting}
-                >
-                  {posting ? "Posting…" : "Post"}
-                </Button>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                If you see “Complete verification to publish”, Moltbook is asking for anti-spam verification.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="feed" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-[1fr_360px]">
+      {view === "feed" ? (
+        <div className="grid gap-4 md:grid-cols-[1fr_360px]">
+          <div className="grid gap-3">
             <Card>
               <CardHeader>
-                <CardTitle>Global feed</CardTitle>
-                <CardDescription>Browse trending posts and engage.</CardDescription>
+                <CardTitle>Feed</CardTitle>
+                <CardDescription>Posts view. Choose a tab like Moltbook.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3">
                 <div className="flex flex-wrap items-center gap-2">
@@ -232,47 +171,39 @@ export default function DashboardPage() {
                     <Button
                       key={idx}
                       size="sm"
-                      className="rounded-full"
-                      variant={sort === t.key && (t.label !== "Discussed" || sort === "hot") ? "secondary" : "outline"}
+                      variant={sort === t.key && (t.label !== "Discussed" || sort === "hot") ? "primary" : "outline"}
                       onClick={() => setSort(t.key)}
                     >
                       {t.label}
                     </Button>
                   ))}
                   <Button size="sm" variant="outline" onClick={refreshPosts} disabled={loadingPosts}>
-                    {loadingPosts ? "Loading…" : "Refresh"}
+                    <FontAwesomeIcon icon={faRotateRight} />
+                    {loadingPosts ? "Loading" : "Refresh"}
                   </Button>
                 </div>
 
-                <Separator />
-
                 <div className="grid gap-2">
                   {posts.map((p) => (
-                    <div key={p.id} className="grid grid-cols-[42px_1fr] gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
-                      <div className="flex flex-col items-center justify-start gap-1 pt-1 text-white/70">
+                    <div key={p.id} className="grid grid-cols-[46px_1fr] gap-3 rounded-2xl border border-[rgb(var(--border))] bg-white/5 p-4">
+                      <div className="flex flex-col items-center justify-start gap-2 pt-1 text-white/70">
                         <button
-                          className="text-xs hover:text-white"
+                          className="text-xs hover:text-[rgb(var(--accent))]"
                           onClick={async () => {
-                            try {
-                              const res = await mbUpvotePost(apiKey, p.id);
-                              toast.success(res?.message || "Upvoted");
-                              refreshPosts();
-                            } catch (e: unknown) {
-                              const msg = e instanceof Error ? e.message : "Failed to upvote";
-                              toast.error(msg);
-                            }
+                            await mbUpvotePost(apiKey, p.id);
+                            refreshPosts();
                           }}
                           aria-label="Upvote"
                         >
                           ▲
                         </button>
                         <div className="text-sm font-semibold">{p.upvotes ?? 0}</div>
-                        <div className="text-xs opacity-60">▼</div>
+                        <div className="text-xs opacity-40">▼</div>
                       </div>
 
                       <div className="min-w-0">
-                        <div className="mb-1 text-xs text-white/60">
-                          <span className="text-emerald-400">m/{p.submolt?.name || "general"}</span>
+                        <div className="mb-1 text-xs text-white/55">
+                          <span className="text-[rgb(var(--accent))]">m/{p.submolt?.name || "general"}</span>
                           <span className="mx-1">•</span>
                           <span>u/{p.agent_name || "unknown"}</span>
                         </div>
@@ -280,151 +211,195 @@ export default function DashboardPage() {
                         {p.content ? (
                           <div className="mt-2 line-clamp-3 whitespace-pre-wrap text-sm text-white/70">{p.content}</div>
                         ) : null}
-                        {p.url ? (
-                          <div className="mt-2 text-sm text-sky-400">{p.url}</div>
-                        ) : null}
+                        {p.url ? <div className="mt-2 text-sm text-[rgb(var(--accent-2))]">{p.url}</div> : null}
 
                         <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            className="rounded-full"
-                            onClick={() => {
-                              loadThread(p.id);
-                              toast.message("Loaded thread");
-                            }}
-                          >
-                            Comments
+                          <Button size="sm" variant="outline" onClick={() => loadThread(p.id)}>
+                            <FontAwesomeIcon icon={faCommentDots} /> Comments
                           </Button>
                           <Button
                             size="sm"
-                            variant="outline"
-                            className="rounded-full"
+                            variant="ghost"
                             onClick={async () => {
-                              try {
-                                const res = await mbUpvotePost(apiKey, p.id);
-                                toast.success(res?.message || "Upvoted");
-                                refreshPosts();
-                              } catch (e: unknown) {
-                                const msg = e instanceof Error ? e.message : "Failed to upvote";
-                                toast.error(msg);
-                              }
+                              await mbUpvotePost(apiKey, p.id);
+                              refreshPosts();
                             }}
                           >
-                            Upvote
+                            <FontAwesomeIcon icon={faArrowUp} /> Upvote
                           </Button>
                         </div>
                       </div>
                     </div>
                   ))}
 
-                  {posts.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">No posts loaded.</div>
-                  ) : null}
+                  {!posts.length ? <div className="text-sm text-white/50">No posts loaded.</div> : null}
                 </div>
               </CardContent>
             </Card>
+          </div>
 
-            <Card className="h-fit">
+          <div className="grid gap-3">
+            <Card>
               <CardHeader>
-                <CardTitle>Quick tips</CardTitle>
-                <CardDescription>Reduce anti-spam triggers.</CardDescription>
+                <CardTitle>Agent</CardTitle>
+                <CardDescription>Quick status & safety.</CardDescription>
               </CardHeader>
-              <CardContent className="grid gap-2 text-sm text-muted-foreground">
-                <div>• Avoid mass upvotes + many comments in a short burst.</div>
-                <div>• Wait ~25–60s between comments.</div>
-                <div>• Keep content specific and non-repetitive.</div>
+              <CardContent className="grid gap-2 text-sm text-white/65">
+                <div>• Status: {statusText}</div>
+                <div>• Tip: avoid rapid comments/posts to prevent verification.</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick actions</CardTitle>
+                <CardDescription>Jump to create or thread.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-2">
+                <Button variant="outline" onClick={() => setView("create")}>Create post</Button>
+                <Button variant="outline" disabled={!selectedPostId} onClick={() => setView("thread")}>
+                  Open thread
+                </Button>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+        </div>
+      ) : null}
 
-        <TabsContent value="thread" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Thread</CardTitle>
-              <CardDescription>Open a post from the feed to view & reply.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              {selectedPostId ? (
-                <>
-                  {loadingThread ? (
-                    <div className="text-sm text-muted-foreground">Loading…</div>
-                  ) : selectedPost ? (
-                    <div className="rounded-md border p-3">
-                      <div className="text-sm font-medium">{selectedPost.title}</div>
-                      {selectedPost.content ? (
-                        <div className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{selectedPost.content}</div>
-                      ) : null}
+      {view === "thread" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Thread</CardTitle>
+            <CardDescription>Post + comments (Moltbook-style).</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            {!selectedPostId ? (
+              <div className="text-sm text-white/60">Open a post from the feed first.</div>
+            ) : loadingThread ? (
+              <div className="text-sm text-white/60">Loading…</div>
+            ) : (
+              <>
+                {selectedPost ? (
+                  <div className="rounded-2xl border border-[rgb(var(--border))] bg-white/5 p-4">
+                    <div className="text-xs text-white/55">
+                      <span className="text-[rgb(var(--accent))]">m/{selectedPost.submolt?.name || "general"}</span>
+                      <span className="mx-1">•</span>
+                      <span>u/{selectedPost.agent_name || "unknown"}</span>
                     </div>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">Post not found.</div>
-                  )}
-
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium">Reply</label>
-                    <Textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Write a reply…" />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={async () => {
-                          if (!replyText.trim()) return toast.error("Reply is empty");
-                          if (!selectedPostId) return;
-                          setReplying(true);
-                          try {
-                            const res = await mbCreateComment(apiKey, selectedPostId, { content: replyText.trim() });
-                            if (res?.success === false) toast.error(res?.error || res?.message || "Failed");
-                            else toast.success(res?.message || "Replied");
-                            setReplyText("");
-                            const c = await mbListComments(apiKey, selectedPostId, { sort: "new", limit: 25 });
-                            setComments(c.comments ?? []);
-                          } catch (e: unknown) {
-                            const msg = e instanceof Error ? e.message : "Failed";
-                            toast.error(msg);
-                          } finally {
-                            setReplying(false);
-                          }
-                        }}
-                        disabled={replying}
-                      >
-                        {replying ? "Sending…" : "Send reply"}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => selectedPostId && loadThread(selectedPostId)}
-                        disabled={loadingThread}
-                      >
-                        Refresh
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      If replies show “Complete verification to publish”, your agent is being rate-limited by anti-spam.
-                    </p>
+                    <div className="mt-2 text-xl font-semibold">{selectedPost.title}</div>
+                    {selectedPost.content ? (
+                      <div className="mt-3 whitespace-pre-wrap text-sm text-white/70">{selectedPost.content}</div>
+                    ) : null}
                   </div>
+                ) : null}
 
-                  <Separator />
-
-                  <div className="grid gap-2">
-                    <div className="text-sm font-medium">Latest comments</div>
-                    <div className="grid gap-2">
-                      {comments.map((c) => (
-                        <div key={c.id} className="rounded-md border p-3">
-                          <div className="text-xs text-muted-foreground">{c.agent_name || "(unknown)"}</div>
-                          <div className="mt-1 whitespace-pre-wrap text-sm">{c.content}</div>
-                        </div>
-                      ))}
-                      {comments.length === 0 ? (
-                        <div className="text-sm text-muted-foreground">No comments loaded.</div>
-                      ) : null}
-                    </div>
+                <div className="grid gap-2">
+                  <div className="text-sm font-semibold">Write a reply</div>
+                  <Textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Your comment…" />
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={async () => {
+                        if (!replyText.trim() || !selectedPostId) return;
+                        setReplying(true);
+                        try {
+                          await mbCreateComment(apiKey, selectedPostId, { content: replyText.trim() });
+                          setReplyText("");
+                          const c = await mbListComments(apiKey, selectedPostId, { sort: "new", limit: 50 });
+                          setComments(c.comments ?? []);
+                        } finally {
+                          setReplying(false);
+                        }
+                      }}
+                      disabled={replying}
+                    >
+                      {replying ? "Sending…" : "Reply"}
+                    </Button>
+                    <Button variant="outline" onClick={() => selectedPostId && loadThread(selectedPostId)}>
+                      <FontAwesomeIcon icon={faRotateRight} /> Refresh
+                    </Button>
                   </div>
-                </>
-              ) : (
-                <div className="text-sm text-muted-foreground">Go to the Feed tab and click Open on a post.</div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                </div>
+
+                <div className="mt-2">
+                  <div className="text-sm font-semibold">Comments ({comments.length})</div>
+                  <div className="mt-3 grid gap-2">
+                    {comments.map((c) => (
+                      <div key={c.id} className="rounded-2xl border border-[rgb(var(--border))] bg-white/5 p-4">
+                        <div className="text-xs text-white/55">u/{c.agent_name || "unknown"}</div>
+                        <div className="mt-2 whitespace-pre-wrap text-sm text-white/75">{c.content}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {view === "create" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Create a post</CardTitle>
+            <CardDescription>Keep it high-signal. Moltbook has cooldowns.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2 md:grid-cols-2">
+              <div className="grid gap-2">
+                <div className="text-sm font-semibold">Submolt</div>
+                <Input value={submolt} onChange={(e) => setSubmolt(e.target.value)} placeholder="general" />
+              </div>
+              <div className="grid gap-2">
+                <div className="text-sm font-semibold">URL (optional)</div>
+                <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://" />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <div className="text-sm font-semibold">Title</div>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="A useful update…" />
+            </div>
+
+            <div className="grid gap-2">
+              <div className="text-sm font-semibold">Content</div>
+              <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Write something…" />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={async () => {
+                  if (!title.trim()) return;
+                  if (!content.trim() && !url.trim()) return;
+                  setPosting(true);
+                  try {
+                    await mbCreatePost(apiKey, {
+                      submolt: submolt.trim() || "general",
+                      title: title.trim(),
+                      content: content.trim() || undefined,
+                      url: url.trim() || undefined,
+                    });
+                    setTitle("");
+                    setContent("");
+                    setUrl("");
+                    setView("feed");
+                    refreshPosts();
+                  } finally {
+                    setPosting(false);
+                  }
+                }}
+                disabled={posting}
+              >
+                {posting ? "Posting…" : "Post"}
+              </Button>
+              <Button variant="outline" onClick={() => router.push("/register")}>Register new agent</Button>
+            </div>
+
+            <div className="text-xs text-white/45">
+              If you get “Complete verification to publish”, Moltbook is asking for anti-spam verification.
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass, faKey } from "@fortawesome/free-solid-svg-icons";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -13,76 +13,60 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard" },
 ];
 
-function NavLinks({ onClick }: { onClick?: () => void }) {
-  const pathname = usePathname();
-  return (
-    <div className="flex flex-col gap-1">
-      {NAV.map((n) => {
-        const active = pathname === n.href;
-        return (
-          <Link
-            key={n.href}
-            href={n.href}
-            onClick={onClick}
-            className={cn(
-              "rounded-md px-3 py-2 text-sm transition",
-              active ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-            )}
-          >
-            {n.label}
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-50 border-b border-red-600/60 bg-neutral-950">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+      <header className="sticky top-0 z-50 border-b border-[rgba(var(--accent),0.6)] bg-neutral-950/95 backdrop-blur">
+        <div className="container-app flex h-14 items-center justify-between">
           <div className="flex items-center gap-3">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
-                  <span className="text-lg">☰</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72">
-                <div className="mb-6">
-                  <div className="text-sm font-semibold">Moltbook Manager</div>
-                  <div className="text-xs text-muted-foreground">Public beta</div>
-                </div>
-                <NavLinks onClick={() => {}} />
-              </SheetContent>
-            </Sheet>
-
-            <Link href="/" className="font-semibold tracking-tight text-white">
-              Moltbook Manager
+            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-white">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[rgba(var(--accent),0.15)] text-[rgb(var(--accent))]">
+                m
+              </span>
+              Moltbook-Manager
             </Link>
-            <span className="hidden rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-white/60 md:inline-flex">
-              Public beta
-            </span>
           </div>
 
-          <div className="hidden md:block">
-            <div className="flex items-center gap-1">
-              {NAV.slice(1).map((n) => (
-                <Button key={n.href} asChild variant="ghost" size="sm">
-                  <Link href={n.href}>{n.label}</Link>
-                </Button>
-              ))}
-            </div>
+          <div className="hidden md:flex items-center gap-1">
+            {NAV.map((n) => (
+              <Link
+                key={n.href}
+                href={n.href}
+                className={
+                  "rounded-xl px-3 py-2 text-sm transition " +
+                  (pathname === n.href ? "bg-white/5 text-white" : "text-white/60 hover:bg-white/5 hover:text-white")
+                }
+              >
+                {n.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[rgb(var(--border))] bg-white/5 text-white/70 hover:bg-white/10"
+              aria-label="Search"
+              onClick={() => router.push("/dashboard")}
+            >
+              <FontAwesomeIcon icon={faMagnifyingGlass} />
+            </button>
+            <Button variant="outline" size="sm" onClick={() => router.push("/login")}
+              >
+              <FontAwesomeIcon icon={faKey} />
+              Connect
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
+      <main className="container-app py-8 md:py-10">{children}</main>
 
       <footer className="border-t border-white/10 py-8">
-        <div className="mx-auto max-w-6xl px-4 text-xs text-white/50">
-          This app stores Moltbook API keys in your browser storage. Use session mode on shared devices.
+        <div className="container-app text-xs text-white/45">
+          API keys are stored only in your browser storage (no database). Use session mode on shared devices.
         </div>
       </footer>
     </div>

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Label } from "@/components/ui/Label";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { clearAll, connectApiKey, getApiKey, getStorageMode } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 
@@ -52,10 +52,7 @@ export default function LoginPage() {
             <Checkbox
               id="remember"
               checked={remember}
-              onCheckedChange={(v) => {
-                const val = v === true;
-                setRemember(val);
-              }}
+              onChange={(e) => setRemember(e.target.checked)}
             />
             <Label htmlFor="remember" className="text-sm">
               Remember on this device
