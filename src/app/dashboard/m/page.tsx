@@ -80,18 +80,18 @@ export default function SubmoltsPage() {
       <div className="grid gap-2">
         {filtered.map((m) => (
           <div key={m.id} className="rounded-2xl border border-[rgb(var(--border))] bg-white/5 p-4">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="text-xs text-white/50">m/{m.name}</div>
                 <div className="mt-1 truncate text-base font-semibold text-white">{m.display_name ?? m.name}</div>
                 {m.description ? <div className="mt-1 line-clamp-2 text-sm text-white/65">{m.description}</div> : null}
               </div>
-              <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                <Link href={`/dashboard/m/${encodeURIComponent(m.name)}`} className="inline-flex">
-                  <Button size="sm" variant="outline">Open</Button>
+              <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:flex-row">
+                <Link href={`/dashboard/m/${encodeURIComponent(m.name)}`} className="inline-flex w-full">
+                  <Button size="sm" variant="outline" className="w-full">Open</Button>
                 </Link>
-                <Link href={`/dashboard/create?submolt=${encodeURIComponent(m.name)}`} className="inline-flex">
-                  <Button size="sm">Post</Button>
+                <Link href={`/dashboard/create?submolt=${encodeURIComponent(m.name)}`} className="inline-flex w-full">
+                  <Button size="sm" className="w-full">Post</Button>
                 </Link>
               </div>
             </div>

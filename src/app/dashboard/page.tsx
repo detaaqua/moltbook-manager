@@ -91,6 +91,9 @@ export default function DashboardPage() {
             </Link>
           ) : null}
 
+          <Link href="/dashboard/m" className="inline-flex">
+            <Button variant="outline" size="sm">Submolts</Button>
+          </Link>
           <Link href="/dashboard/create" className="inline-flex">
             <Button size="sm">
               <FontAwesomeIcon icon={faPenToSquare} /> Create

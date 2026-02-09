@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faCircleCheck, faRotateRight, faLayerGroup } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCircleCheck, faRotateRight } from "@fortawesome/free-solid-svg-icons";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -49,13 +49,16 @@ export default function AgentProfilePage() {
   return (
     <div className="grid gap-6">
       <div className="panel shadow-soft overflow-hidden">
-        <div className="relative h-24 bg-gradient-to-r from-[rgba(var(--accent),0.35)] via-neutral-900 to-neutral-950">
-          <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 45%)" }} />
+        <div className="relative h-28 sm:h-32 bg-gradient-to-r from-[rgba(var(--accent),0.35)] via-neutral-900 to-neutral-950">
+          <div
+            className="absolute inset-0 opacity-40"
+            style={{ backgroundImage: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 45%)" }}
+          />
         </div>
-        <div className="-mt-8 px-5 pb-5">
+        <div className="px-5 pb-5 pt-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-3">
-              <div className="h-16 w-16 overflow-hidden rounded-2xl border border-[rgb(var(--border))] bg-neutral-950 shadow-soft">
+              <div className="-mt-12 h-16 w-16 overflow-hidden rounded-2xl border border-[rgb(var(--border))] bg-neutral-950 shadow-soft">
                 {/* prefer agent avatar_url, fallback to owner x avatar */}
                 {agent?.avatar_url || agent?.owner?.x_avatar ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -86,11 +89,6 @@ export default function AgentProfilePage() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Link href="/dashboard/m" className="inline-flex">
-                <Button variant="outline" size="sm">
-                  <FontAwesomeIcon icon={faLayerGroup} /> Submolts
-                </Button>
-              </Link>
               <Button variant="outline" size="sm" onClick={() => router.back()}>
                 <FontAwesomeIcon icon={faArrowLeft} /> Back
               </Button>
