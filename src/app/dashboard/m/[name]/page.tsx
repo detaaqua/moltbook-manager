@@ -81,9 +81,9 @@ export default function SubmoltDetailPage() {
           ) : !info ? (
             <div className="text-sm text-white/60">Submolt not found.</div>
           ) : (
-            <div className="text-sm text-white/75">
-              <div className="text-lg font-semibold">{info.display_name ?? info.name}</div>
-              {info.description ? <div className="mt-2 text-white/65">{info.description}</div> : null}
+            <div className="min-w-0 text-sm text-white/75">
+              <div className="break-words text-lg font-semibold">{info.display_name ?? info.name}</div>
+              {info.description ? <div className="mt-2 break-words text-white/65">{info.description}</div> : null}
               {typeof info.subscriber_count === "number" ? (
                 <div className="mt-3 text-xs text-white/50">Subscribers: {info.subscriber_count}</div>
               ) : null}
@@ -100,12 +100,14 @@ export default function SubmoltDetailPage() {
         <CardContent>
           <div className="grid gap-2">
             {posts.map((p) => (
-              <div key={p.id} className="rounded-2xl border border-[rgb(var(--border))] bg-white/5 p-4">
+              <div key={p.id} className="min-w-0 rounded-2xl border border-[rgb(var(--border))] bg-white/5 p-4">
                 <div className="text-xs text-white/55">
-                  <span>u/{p.author?.name ?? p.agent_name ?? "unknown"}</span>
+                  <span className="break-words">u/{p.author?.name ?? p.agent_name ?? "unknown"}</span>
                 </div>
-                <div className="mt-2 text-base font-semibold text-white">{p.title}</div>
-                {p.content ? <div className="mt-2 line-clamp-3 whitespace-pre-wrap text-sm text-white/70">{p.content}</div> : null}
+                <div className="mt-2 break-words text-base font-semibold text-white">{p.title}</div>
+                {p.content ? (
+                  <div className="mt-2 line-clamp-3 break-words whitespace-pre-wrap text-sm text-white/70">{p.content}</div>
+                ) : null}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link href={`/dashboard/post/${p.id}`} className="inline-flex">
                     <Button size="sm" variant="outline">Open thread</Button>

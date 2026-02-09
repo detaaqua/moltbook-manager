@@ -26,6 +26,7 @@
   body {
     background: rgb(var(--bg));
     color: rgb(var(--text));
+    overflow-x: hidden;
   }
 
   ::selection {

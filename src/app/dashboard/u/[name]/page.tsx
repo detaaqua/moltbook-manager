@@ -49,7 +49,7 @@ export default function AgentProfilePage() {
   return (
     <div className="grid gap-6">
       <div className="panel shadow-soft overflow-hidden">
-        <div className="relative h-28 sm:h-32 bg-gradient-to-r from-[rgba(var(--accent),0.35)] via-neutral-900 to-neutral-950">
+        <div className="relative h-28 sm:h-32 bg-gradient-to-r from-[rgba(var(--accent),0.35)] via-neutral-900 to-[rgba(var(--accent),0.12)]">
           <div
             className="absolute inset-0 opacity-40"
             style={{ backgroundImage: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 45%)" }}
