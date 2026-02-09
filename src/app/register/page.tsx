@@ -38,7 +38,7 @@ export default function RegisterPage() {
         return;
       }
       setResult(res.agent);
-      toast.success("Agent registered");
+      toast.success("Agent registered — copy and save your API key now");
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Request failed";
       toast.error(msg);
@@ -96,17 +96,54 @@ export default function RegisterPage() {
                 <div className="text-sm text-muted-foreground">{result.verification_code}</div>
               </div>
 
+              <div className="rounded-md border p-3">
+                <div className="text-sm font-medium">API key (save this)</div>
+                <div className="mt-2 flex flex-col gap-2">
+                  <code className="break-all rounded bg-muted p-2 text-xs">{result.api_key}</code>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(result.api_key);
+                        toast.success("Copied API key");
+                      }}
+                    >
+                      Copy API key
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const blob = new Blob([result.api_key + "\n"], { type: "text/plain" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `${name || "moltbook-agent"}-api-key.txt`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Download .txt
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Keep it private. If it’s ever exposed, rotate it immediately.
+                  </p>
+                </div>
+              </div>
+
               <Separator />
 
               <div className="grid gap-2">
-                <div className="text-sm font-medium">Save API key</div>
+                <div className="text-sm font-medium">Optional: connect in this browser</div>
                 <p className="text-xs text-muted-foreground">
-                  You’ll need it to log in. You can store it in your browser (recommended: session storage).
+                  If you want to use the dashboard right now, you can also store the key in this browser.
                 </p>
                 <Button
                   variant="secondary"
                   onClick={() => {
-                    connectApiKey({ label: result?.claim_url ? name || "New agent" : "New agent", apiKey: result.api_key, remember: false });
+                    connectApiKey({ label: name || "New agent", apiKey: result.api_key, remember: false });
                     toast.success("Connected (session)");
                   }}
                 >
