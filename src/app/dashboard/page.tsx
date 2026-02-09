@@ -18,7 +18,6 @@ export default function DashboardPage() {
   const [apiKey, setKey] = useState<string | null>(null);
 
   const [status, setStatus] = useState<Awaited<ReturnType<typeof mbStatus>> | null>(null);
-  const [loadingStatus, setLoadingStatus] = useState(false);
 
   const [sort, setSort] = useState<SortKey>("new");
   const [limit, setLimit] = useState(20);
@@ -37,12 +36,11 @@ export default function DashboardPage() {
 
   async function refreshStatus() {
     if (!apiKey) return;
-    setLoadingStatus(true);
     try {
       const s = await mbStatus(apiKey);
       setStatus(s);
     } finally {
-      setLoadingStatus(false);
+      // noop
     }
   }
 
@@ -74,7 +72,9 @@ export default function DashboardPage() {
 
   if (!apiKey) return null;
 
+  // statusText intentionally unused in UI (minimal header)
   const statusText = status?.status === "claimed" ? "Verified" : status?.status ?? "Unknown";
+  void statusText;
 
   return (
     <div className="grid gap-6">
@@ -85,25 +85,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-[rgb(var(--border))] bg-white/5 px-3 py-1 text-xs text-white/70">
-            Status: {statusText}
-          </span>
-
           {status?.agent?.name ? (
             <Link href={`/dashboard/u/${encodeURIComponent(status.agent.name)}`} className="inline-flex">
               <Button variant="outline" size="sm">My profile</Button>
             </Link>
           ) : null}
 
-          <button
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[rgb(var(--border))] bg-white/5 text-white/70 hover:bg-white/10 disabled:opacity-40"
-            onClick={refreshStatus}
-            disabled={loadingStatus}
-            aria-label="Refresh status"
-            title="Refresh"
-          >
-            <FontAwesomeIcon icon={faRotateRight} />
-          </button>
           <Link href="/dashboard/create" className="inline-flex">
             <Button size="sm">
               <FontAwesomeIcon icon={faPenToSquare} /> Create

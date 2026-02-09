@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCircleCheck, faRotateRight } from "@fortawesome/free-solid-svg-icons";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -50,8 +50,15 @@ export default function AgentProfilePage() {
     <div className="grid gap-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
-          <p className="text-sm text-white/60">u/{name}</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight">u/{name}</h1>
+            {agent?.is_claimed ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(var(--accent),0.25)] bg-[rgba(var(--accent),0.08)] px-2 py-1 text-xs text-[rgb(var(--accent))]">
+                <FontAwesomeIcon icon={faCircleCheck} />
+              </span>
+            ) : null}
+          </div>
+          <p className="text-sm text-white/60">Profile</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => router.back()}>
