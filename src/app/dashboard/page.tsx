@@ -21,8 +21,10 @@ export default function DashboardPage() {
   const [loadingStatus, setLoadingStatus] = useState(false);
 
   const [sort, setSort] = useState<SortKey>("new");
+  const [limit, setLimit] = useState(20);
   const [posts, setPosts] = useState<NonNullable<Awaited<ReturnType<typeof mbListPosts>>["posts"]>>([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     const k = getApiKey();
@@ -44,12 +46,15 @@ export default function DashboardPage() {
     }
   }
 
-  async function refreshPosts() {
+  async function refreshPosts(nextLimit?: number) {
     if (!apiKey) return;
+    const useLimit = nextLimit ?? limit;
     setLoadingPosts(true);
     try {
-      const res = await mbListPosts(apiKey, { sort, limit: 20 });
-      setPosts(res.posts ?? []);
+      const res = await mbListPosts(apiKey, { sort, limit: useLimit });
+      const list = res.posts ?? [];
+      setPosts(list);
+      setHasMore(list.length >= useLimit);
     } finally {
       setLoadingPosts(false);
     }
@@ -63,7 +68,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!apiKey) return;
-    refreshPosts();
+    setLimit(20);
+    refreshPosts(20);
   }, [sort]);
 
   if (!apiKey) return null;
@@ -125,7 +131,7 @@ export default function DashboardPage() {
                 {t.label}
               </Button>
             ))}
-            <Button size="sm" variant="outline" onClick={refreshPosts} disabled={loadingPosts}>
+            <Button size="sm" variant="outline" onClick={() => refreshPosts()} disabled={loadingPosts}>
               <FontAwesomeIcon icon={faRotateRight} />
               {loadingPosts ? "Loading" : "Refresh"}
             </Button>
@@ -184,9 +190,46 @@ export default function DashboardPage() {
             ))}
 
             {!posts.length ? <div className="text-sm text-white/50">No posts loaded.</div> : null}
+
+            {/* infinite scroll */}
+            {posts.length ? (
+              <div className="mt-3">
+                <LoadMore
+                  disabled={loadingPosts || !hasMore}
+                  onLoad={() => {
+                    const next = limit + 20;
+                    setLimit(next);
+                    refreshPosts(next);
+                  }}
+                />
+                <div className="mt-2 text-center text-xs text-white/45">
+                  {loadingPosts ? "Loading…" : hasMore ? "Scroll down to load more" : "End of feed"}
+                </div>
+              </div>
+            ) : null}
           </div>
         </CardContent>
       </Card>
     </div>
   );
+}
+
+function LoadMore({ disabled, onLoad }: { disabled: boolean; onLoad: () => void }) {
+  useEffect(() => {
+    if (disabled) return;
+    const el = document.getElementById("mb-load-more");
+    if (!el) return;
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) onLoad();
+      },
+      { rootMargin: "800px" }
+    );
+
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [disabled, onLoad]);
+
+  return <div id="mb-load-more" className="h-10 w-full" />;
 }
