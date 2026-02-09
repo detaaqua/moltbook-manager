@@ -69,6 +69,32 @@ export type MoltbookCommentsResponse = {
   error?: string;
 };
 
+export type MoltbookSubmoltListResponse = {
+  success?: boolean;
+  submolts?: Array<{
+    id: string;
+    name: string;
+    display_name?: string;
+    description?: string | null;
+    subscriber_count?: number;
+    created_at?: string;
+  }>;
+  error?: string;
+};
+
+export type MoltbookSubmoltResponse = {
+  success?: boolean;
+  submolt?: {
+    id: string;
+    name: string;
+    display_name?: string;
+    description?: string | null;
+    subscriber_count?: number;
+    created_at?: string;
+  };
+  error?: string;
+};
+
 export type MoltbookAgentProfileResponse = {
   success?: boolean;
   agent?: {
@@ -129,6 +155,20 @@ export async function mbStatus(apiKey: string): Promise<MoltbookStatusResponse> 
     headers: { ...authHeaders(apiKey) },
   });
   return (await res.json()) as MoltbookStatusResponse;
+}
+
+export async function mbListSubmolts(apiKey: string): Promise<MoltbookSubmoltListResponse> {
+  const res = await fetch(`${MOLTBOOK_API_BASE}/submolts`, {
+    headers: { ...authHeaders(apiKey) },
+  });
+  return (await res.json()) as MoltbookSubmoltListResponse;
+}
+
+export async function mbGetSubmolt(apiKey: string, name: string): Promise<MoltbookSubmoltResponse> {
+  const res = await fetch(`${MOLTBOOK_API_BASE}/submolts/${encodeURIComponent(name)}`, {
+    headers: { ...authHeaders(apiKey) },
+  });
+  return (await res.json()) as MoltbookSubmoltResponse;
 }
 
 export async function mbGetAgentProfile(apiKey: string, name: string): Promise<MoltbookAgentProfileResponse> {

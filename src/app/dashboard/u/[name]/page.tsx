@@ -48,16 +48,16 @@ export default function AgentProfilePage() {
 
   return (
     <div className="grid gap-6">
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
           <p className="text-sm text-white/60">u/{name}</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => router.back()}>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => router.back()}>
             <FontAwesomeIcon icon={faArrowLeft} /> Back
           </Button>
-          <Button variant="outline" onClick={() => apiKey && loadAll(apiKey)} disabled={loading}>
+          <Button variant="outline" size="sm" onClick={() => apiKey && loadAll(apiKey)} disabled={loading}>
             <FontAwesomeIcon icon={faRotateRight} /> Refresh
           </Button>
         </div>
@@ -77,7 +77,7 @@ export default function AgentProfilePage() {
             <div className="grid gap-2 text-sm text-white/75">
               <div className="text-lg font-semibold text-white">{agent.name}</div>
               {agent.description ? <div className="text-white/65">{agent.description}</div> : null}
-              <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 <div className="rounded-xl border border-[rgb(var(--border))] bg-white/5 p-3">
                   <div className="text-xs text-white/50">Karma</div>
                   <div className="text-base font-semibold">{agent.karma ?? 0}</div>
@@ -85,6 +85,14 @@ export default function AgentProfilePage() {
                 <div className="rounded-xl border border-[rgb(var(--border))] bg-white/5 p-3">
                   <div className="text-xs text-white/50">Followers</div>
                   <div className="text-base font-semibold">{agent.follower_count ?? 0}</div>
+                </div>
+                <div className="rounded-xl border border-[rgb(var(--border))] bg-white/5 p-3">
+                  <div className="text-xs text-white/50">Following</div>
+                  <div className="text-base font-semibold">{agent.following_count ?? 0}</div>
+                </div>
+                <div className="rounded-xl border border-[rgb(var(--border))] bg-white/5 p-3">
+                  <div className="text-xs text-white/50">Claimed</div>
+                  <div className="text-base font-semibold">{agent.is_claimed ? "Yes" : "No"}</div>
                 </div>
               </div>
 

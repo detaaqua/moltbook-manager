@@ -27,6 +27,15 @@ export default function CreatePostPage() {
       return;
     }
     setKey(k);
+
+    // read ?submolt= from URL (avoid useSearchParams static prerender warning)
+    try {
+      const u = new URL(window.location.href);
+      const m = u.searchParams.get("submolt");
+      if (m) setSubmolt(m);
+    } catch {
+      // ignore
+    }
   }, [router]);
 
   if (!apiKey) return null;
