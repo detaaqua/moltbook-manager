@@ -138,11 +138,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="compose" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="compose">Post</TabsTrigger>
-          <TabsTrigger value="feed">Feed</TabsTrigger>
-          <TabsTrigger value="thread">Thread</TabsTrigger>
+      <Tabs defaultValue="feed" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-neutral-900/60">
+          <TabsTrigger value="feed">Posts</TabsTrigger>
+          <TabsTrigger value="thread">Comments</TabsTrigger>
+          <TabsTrigger value="compose">Create</TabsTrigger>
         </TabsList>
 
         <TabsContent value="compose" className="mt-4">
@@ -222,14 +222,21 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="grid gap-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  {(["hot", "new", "top", "rising"] as const).map((s) => (
+                  {([
+                    { key: "hot", label: "Posts" },
+                    { key: "rising", label: "Random" },
+                    { key: "new", label: "New" },
+                    { key: "top", label: "Top" },
+                    { key: "hot", label: "Discussed" },
+                  ] as const).map((t, idx) => (
                     <Button
-                      key={s}
+                      key={idx}
                       size="sm"
-                      variant={sort === s ? "secondary" : "outline"}
-                      onClick={() => setSort(s)}
+                      className="rounded-full"
+                      variant={sort === t.key && (t.label !== "Discussed" || sort === "hot") ? "secondary" : "outline"}
+                      onClick={() => setSort(t.key)}
                     >
-                      {s}
+                      {t.label}
                     </Button>
                   ))}
                   <Button size="sm" variant="outline" onClick={refreshPosts} disabled={loadingPosts}>
@@ -241,18 +248,58 @@ export default function DashboardPage() {
 
                 <div className="grid gap-2">
                   {posts.map((p) => (
-                    <div key={p.id} className="rounded-md border p-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-medium">{p.title}</div>
-                          <div className="mt-1 text-xs text-muted-foreground">
-                            {p.submolt?.display_name || p.submolt?.name || "general"} • {p.upvotes ?? 0} upvotes
-                          </div>
+                    <div key={p.id} className="grid grid-cols-[42px_1fr] gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+                      <div className="flex flex-col items-center justify-start gap-1 pt-1 text-white/70">
+                        <button
+                          className="text-xs hover:text-white"
+                          onClick={async () => {
+                            try {
+                              const res = await mbUpvotePost(apiKey, p.id);
+                              toast.success(res?.message || "Upvoted");
+                              refreshPosts();
+                            } catch (e: unknown) {
+                              const msg = e instanceof Error ? e.message : "Failed to upvote";
+                              toast.error(msg);
+                            }
+                          }}
+                          aria-label="Upvote"
+                        >
+                          ▲
+                        </button>
+                        <div className="text-sm font-semibold">{p.upvotes ?? 0}</div>
+                        <div className="text-xs opacity-60">▼</div>
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="mb-1 text-xs text-white/60">
+                          <span className="text-emerald-400">m/{p.submolt?.name || "general"}</span>
+                          <span className="mx-1">•</span>
+                          <span>u/{p.agent_name || "unknown"}</span>
                         </div>
-                        <div className="flex shrink-0 items-center gap-2">
+                        <div className="text-pretty text-base font-semibold text-white">{p.title}</div>
+                        {p.content ? (
+                          <div className="mt-2 line-clamp-3 whitespace-pre-wrap text-sm text-white/70">{p.content}</div>
+                        ) : null}
+                        {p.url ? (
+                          <div className="mt-2 text-sm text-sky-400">{p.url}</div>
+                        ) : null}
+
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="rounded-full"
+                            onClick={() => {
+                              loadThread(p.id);
+                              toast.message("Loaded thread");
+                            }}
+                          >
+                            Comments
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
+                            className="rounded-full"
                             onClick={async () => {
                               try {
                                 const res = await mbUpvotePost(apiKey, p.id);
@@ -265,16 +312,6 @@ export default function DashboardPage() {
                             }}
                           >
                             Upvote
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => {
-                              loadThread(p.id);
-                              toast.message("Loaded thread");
-                            }}
-                          >
-                            Open
                           </Button>
                         </div>
                       </div>

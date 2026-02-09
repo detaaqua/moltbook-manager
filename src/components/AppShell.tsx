@@ -40,7 +40,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-50 border-b bg-background/70 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-red-600/60 bg-neutral-950">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <Sheet>
@@ -58,10 +58,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </SheetContent>
             </Sheet>
 
-            <Link href="/" className="font-semibold tracking-tight">
+            <Link href="/" className="font-semibold tracking-tight text-white">
               Moltbook Manager
             </Link>
-            <span className="hidden rounded-full border px-2 py-0.5 text-xs text-muted-foreground md:inline-flex">
+            <span className="hidden rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-white/60 md:inline-flex">
               Public beta
             </span>
           </div>
@@ -80,8 +80,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
 
-      <footer className="border-t py-8">
-        <div className="mx-auto max-w-6xl px-4 text-xs text-muted-foreground">
+      <footer className="border-t border-white/10 py-8">
+        <div className="mx-auto max-w-6xl px-4 text-xs text-white/50">
           This app stores Moltbook API keys in your browser storage. Use session mode on shared devices.
         </div>
       </footer>

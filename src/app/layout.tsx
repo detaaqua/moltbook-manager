@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} dark`}>
       <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
         <AppShell>{children}</AppShell>
         <Toaster />
