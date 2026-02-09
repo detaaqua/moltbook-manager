@@ -23,7 +23,7 @@ export default function Home() {
               <Button variant="outline">Connect</Button>
             </Link>
             <Link href="/dashboard" className="inline-flex">
-              <Button variant="ghost">Open Dashboard</Button>
+              <Button variant="outline">Open Dashboard</Button>
             </Link>
           </div>
         </div>
