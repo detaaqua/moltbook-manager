@@ -28,8 +28,10 @@ export type MoltbookPostsResponse = {
     url?: string | null;
     upvotes?: number;
     downvotes?: number;
+    comment_count?: number;
     created_at?: string;
-    agent_name?: string | null;
+    agent_name?: string | null; // legacy
+    author?: { id: string; name: string; karma?: number; follower_count?: number } | null;
     submolt?: { name: string; display_name?: string } | null;
   }>;
   error?: string;
@@ -45,7 +47,9 @@ export type MoltbookPostResponse = {
     created_at?: string;
     upvotes?: number;
     downvotes?: number;
-    agent_name?: string | null;
+    comment_count?: number;
+    agent_name?: string | null; // legacy
+    author?: { id: string; name: string; karma?: number; follower_count?: number } | null;
     submolt?: { name: string; display_name?: string } | null;
   };
   error?: string;
@@ -57,9 +61,47 @@ export type MoltbookCommentsResponse = {
     id: string;
     content: string;
     created_at?: string;
-    agent_name?: string | null;
+    agent_name?: string | null; // legacy
+    author?: { id: string; name: string; karma?: number } | null;
     upvotes?: number;
     parent_id?: string | null;
+  }>;
+  error?: string;
+};
+
+export type MoltbookAgentProfileResponse = {
+  success?: boolean;
+  agent?: {
+    id: string;
+    name: string;
+    description?: string | null;
+    karma?: number;
+    created_at?: string;
+    last_active?: string;
+    is_active?: boolean;
+    is_claimed?: boolean;
+    follower_count?: number;
+    following_count?: number;
+    avatar_url?: string | null;
+    owner?: {
+      x_handle?: string;
+      x_name?: string;
+      x_avatar?: string;
+      x_bio?: string;
+      x_follower_count?: number;
+      x_following_count?: number;
+      x_verified?: boolean;
+    } | null;
+  };
+  recentPosts?: Array<{
+    id: string;
+    title: string;
+    content?: string | null;
+    upvotes?: number;
+    downvotes?: number;
+    comment_count?: number;
+    created_at?: string;
+    submolt?: { name: string };
   }>;
   error?: string;
 };
@@ -89,6 +131,15 @@ export async function mbStatus(apiKey: string): Promise<MoltbookStatusResponse> 
   return (await res.json()) as MoltbookStatusResponse;
 }
 
+export async function mbGetAgentProfile(apiKey: string, name: string): Promise<MoltbookAgentProfileResponse> {
+  const qs = new URLSearchParams();
+  qs.set("name", name);
+  const res = await fetch(`${MOLTBOOK_API_BASE}/agents/profile?${qs.toString()}`, {
+    headers: { ...authHeaders(apiKey) },
+  });
+  return (await res.json()) as MoltbookAgentProfileResponse;
+}
+
 export type MoltbookActionResponse = {
   success?: boolean;
   message?: string;
@@ -113,11 +164,14 @@ export async function mbCreatePost(
   return (await res.json()) as MoltbookActionResponse;
 }
 
-export async function mbListPosts(apiKey: string, params: {
-  sort: "hot" | "new" | "top" | "rising";
-  limit?: number;
-  submolt?: string;
-}): Promise<MoltbookPostsResponse> {
+export async function mbListPosts(
+  apiKey: string,
+  params: {
+    sort: "hot" | "new" | "top" | "rising";
+    limit?: number;
+    submolt?: string;
+  }
+): Promise<MoltbookPostsResponse> {
   const qs = new URLSearchParams();
   qs.set("sort", params.sort);
   qs.set("limit", String(params.limit ?? 10));
@@ -160,10 +214,14 @@ export async function mbCreateComment(
   return (await res.json()) as MoltbookActionResponse;
 }
 
-export async function mbListComments(apiKey: string, postId: string, params: {
-  sort: "top" | "new" | "controversial";
-  limit?: number;
-}): Promise<MoltbookCommentsResponse> {
+export async function mbListComments(
+  apiKey: string,
+  postId: string,
+  params: {
+    sort: "top" | "new" | "controversial";
+    limit?: number;
+  }
+): Promise<MoltbookCommentsResponse> {
   const qs = new URLSearchParams();
   qs.set("sort", params.sort);
   if (params.limit) qs.set("limit", String(params.limit));

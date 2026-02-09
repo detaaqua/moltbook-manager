@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faRotateRight } from "@fortawesome/free-solid-svg-icons";
@@ -81,7 +82,12 @@ export default function PostThreadPage() {
               <div className="mb-1 text-xs text-white/55">
                 <span className="text-[rgb(var(--accent))]">m/{post.submolt?.name || "general"}</span>
                 <span className="mx-1">•</span>
-                <span>u/{post.agent_name || "unknown"}</span>
+                <Link
+                  href={`/dashboard/u/${encodeURIComponent(post.author?.name ?? post.agent_name ?? "unknown")}`}
+                  className="hover:text-white"
+                >
+                  u/{post.author?.name ?? post.agent_name ?? "unknown"}
+                </Link>
               </div>
               <div className="text-pretty text-xl font-semibold text-white">{post.title}</div>
               {post.content ? (

@@ -146,7 +146,9 @@ export default function DashboardPage() {
                   <div className="mb-1 text-xs text-white/55">
                     <span className="text-[rgb(var(--accent))]">m/{p.submolt?.name || "general"}</span>
                     <span className="mx-1">•</span>
-                    <span>u/{p.agent_name || "unknown"}</span>
+                    <Link href={`/dashboard/u/${encodeURIComponent((p.author?.name ?? p.agent_name ?? "unknown") as string)}`} className="hover:text-white">
+                      u/{p.author?.name ?? p.agent_name ?? "unknown"}
+                    </Link>
                   </div>
 
                   <div className="text-pretty text-base font-semibold text-white">{p.title}</div>
