@@ -82,6 +82,13 @@ export default function DashboardPage() {
           <span className="rounded-full border border-[rgb(var(--border))] bg-white/5 px-3 py-1 text-xs text-white/70">
             Status: {statusText}
           </span>
+
+          {status?.agent?.name ? (
+            <Link href={`/dashboard/u/${encodeURIComponent(status.agent.name)}`} className="inline-flex">
+              <Button variant="outline" size="sm">My profile</Button>
+            </Link>
+          ) : null}
+
           <Button variant="outline" size="sm" onClick={refreshStatus} disabled={loadingStatus}>
             <FontAwesomeIcon icon={faRotateRight} />
             Refresh

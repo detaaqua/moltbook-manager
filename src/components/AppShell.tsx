@@ -60,10 +60,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             {connected ? (
               <div className="flex items-center gap-2">
-                <div className="hidden sm:flex items-center gap-2 rounded-xl border border-[rgb(var(--border))] bg-white/5 px-3 py-2 text-sm text-white/75">
+                <Link
+                  href="/dashboard"
+                  className="hidden sm:flex items-center gap-2 rounded-xl border border-[rgb(var(--border))] bg-white/5 px-3 py-2 text-sm text-white/75 hover:bg-white/10"
+                >
                   <FontAwesomeIcon icon={faUser} />
                   <span className="max-w-[160px] truncate">{label ?? "Connected"}</span>
-                </div>
+                </Link>
                 <Button
                   variant="outline"
                   size="sm"
