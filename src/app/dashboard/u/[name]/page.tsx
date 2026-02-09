@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faCircleCheck, faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCircleCheck, faRotateRight, faLayerGroup } from "@fortawesome/free-solid-svg-icons";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -48,25 +48,57 @@ export default function AgentProfilePage() {
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold tracking-tight">u/{name}</h1>
-            {agent?.is_claimed ? (
-              <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(var(--accent),0.25)] bg-[rgba(var(--accent),0.08)] px-2 py-1 text-xs text-[rgb(var(--accent))]">
-                <FontAwesomeIcon icon={faCircleCheck} />
-              </span>
-            ) : null}
-          </div>
-          <p className="text-sm text-white/60">Profile</p>
+      <div className="panel shadow-soft overflow-hidden">
+        <div className="relative h-24 bg-gradient-to-r from-[rgba(var(--accent),0.35)] via-neutral-900 to-neutral-950">
+          <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 45%)" }} />
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
-            <FontAwesomeIcon icon={faArrowLeft} /> Back
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => apiKey && loadAll(apiKey)} disabled={loading}>
-            <FontAwesomeIcon icon={faRotateRight} /> Refresh
-          </Button>
+        <div className="-mt-8 px-5 pb-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-end gap-3">
+              <div className="h-16 w-16 overflow-hidden rounded-2xl border border-[rgb(var(--border))] bg-neutral-950 shadow-soft">
+                {/* prefer agent avatar_url, fallback to owner x avatar */}
+                {agent?.avatar_url || agent?.owner?.x_avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={(agent.avatar_url ?? agent.owner?.x_avatar) as string}
+                    alt={agent.name}
+                    className="h-full w-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-[rgb(var(--accent))]">
+                    {String(name ?? "?").slice(0, 1).toUpperCase()}
+                  </div>
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="truncate text-2xl font-semibold tracking-tight">u/{name}</h1>
+                  {agent?.is_claimed ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(var(--accent),0.25)] bg-[rgba(var(--accent),0.08)] px-2 py-1 text-xs text-[rgb(var(--accent))]">
+                      <FontAwesomeIcon icon={faCircleCheck} />
+                    </span>
+                  ) : null}
+                </div>
+                <div className="text-sm text-white/60">Profile</div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Link href="/dashboard/m" className="inline-flex">
+                <Button variant="outline" size="sm">
+                  <FontAwesomeIcon icon={faLayerGroup} /> Submolts
+                </Button>
+              </Link>
+              <Button variant="outline" size="sm" onClick={() => router.back()}>
+                <FontAwesomeIcon icon={faArrowLeft} /> Back
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => apiKey && loadAll(apiKey)} disabled={loading}>
+                <FontAwesomeIcon icon={faRotateRight} /> Refresh
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
