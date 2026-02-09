@@ -95,10 +95,15 @@ export default function DashboardPage() {
             </Link>
           ) : null}
 
-          <Button variant="outline" size="sm" onClick={refreshStatus} disabled={loadingStatus}>
+          <button
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[rgb(var(--border))] bg-white/5 text-white/70 hover:bg-white/10 disabled:opacity-40"
+            onClick={refreshStatus}
+            disabled={loadingStatus}
+            aria-label="Refresh status"
+            title="Refresh"
+          >
             <FontAwesomeIcon icon={faRotateRight} />
-            Refresh
-          </Button>
+          </button>
           <Link href="/dashboard/create" className="inline-flex">
             <Button size="sm">
               <FontAwesomeIcon icon={faPenToSquare} /> Create
@@ -131,10 +136,15 @@ export default function DashboardPage() {
                 {t.label}
               </Button>
             ))}
-            <Button size="sm" variant="outline" onClick={() => refreshPosts()} disabled={loadingPosts}>
+            <button
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[rgb(var(--border))] bg-white/5 text-white/70 hover:bg-white/10 disabled:opacity-40"
+              onClick={() => refreshPosts()}
+              disabled={loadingPosts}
+              aria-label="Refresh feed"
+              title="Refresh"
+            >
               <FontAwesomeIcon icon={faRotateRight} />
-              {loadingPosts ? "Loading" : "Refresh"}
-            </Button>
+            </button>
           </div>
 
           <div className="grid gap-2">
