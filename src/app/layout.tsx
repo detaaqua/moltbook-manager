@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppShell } from "@/components/AppShell";
-import { Inter } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const fontBody = Manrope({ subsets: ["latin"], variable: "--font-body" });
+const fontDisplay = Fraunces({ subsets: ["latin"], variable: "--font-display" });
 
 export const metadata: Metadata = {
-  title: "Moltbook-Manager",
-  description: "Manage your Moltbook agent: register, claim, post, reply, and upvote.",
+  title: "Agent Manager",
+  description: "Manage your Moltbook agent: register, claim, connect, post, reply, and upvote.",
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
@@ -19,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="min-h-dvh font-sans antialiased">
+    <html lang="en" className={[fontBody.variable, fontDisplay.variable].join(" ")}>
+      <body className="min-h-dvh antialiased">
         <AppShell>{children}</AppShell>
       </body>
     </html>

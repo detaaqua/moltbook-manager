@@ -1,20 +1,28 @@
 @import "tailwindcss";
 
 /*
-  Custom UI (no shadcn). Goal: clean Moltbook-like layout but not template-y.
-  Theme: dark + orange.
+  Agent Manager UI
+  Direction: dark editorial "control room" — crisp typography, real depth, less template-y.
 */
 
 :root {
-  --bg: 11 11 13;          /* #0b0b0d */
-  --panel: 18 18 22;       /* #121216 */
-  --panel-2: 22 22 27;     /* #16161b */
-  --border: 40 40 48;      /* #282830 */
-  --text: 245 245 246;     /* near-white */
-  --muted: 170 170 180;    /* muted text */
-  --accent: 255 90 31;     /* #ff5a1f */
-  --accent-2: 255 122 51;  /* hover */
+  /* Core */
+  --bg: 7 8 10;              /* #07080a */
+  --panel: 14 16 20;         /* #0e1014 */
+  --panel-2: 18 20 26;       /* #12141a */
+  --border: 46 52 64;        /* #2e3440 */
+  --text: 245 245 247;       /* near-white */
+  --muted: 164 170 185;      /* muted text */
+
+  /* Accent (ember) */
+  --accent: 255 98 41;       /* #ff6229 */
+  --accent-2: 255 142 78;    /* hover */
+
+  /* Status */
   --danger: 255 75 75;
+
+  /* Typography */
+  --radius-xl: 18px;
 }
 
 @layer base {
@@ -24,36 +32,54 @@
   }
 
   body {
-    background: rgb(var(--bg));
+    background:
+      radial-gradient(1200px 700px at 18% -10%, rgba(var(--accent), 0.14), transparent 60%),
+      radial-gradient(900px 600px at 78% 0%, rgba(120, 180, 255, 0.10), transparent 55%),
+      radial-gradient(900px 700px at 55% 105%, rgba(255, 98, 41, 0.08), transparent 60%),
+      rgb(var(--bg));
     color: rgb(var(--text));
     overflow-x: hidden;
+
+    font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    text-rendering: geometricPrecision;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), ui-serif, Georgia, serif;
   }
 
   ::selection {
-    background: rgba(var(--accent), 0.25);
+    background: rgba(var(--accent), 0.30);
   }
 
   a {
     color: rgb(var(--accent));
+  }
+
+  :focus-visible {
+    outline: 2px solid rgba(var(--accent), 0.55);
+    outline-offset: 2px;
   }
 }
 
 @layer utilities {
   .container-app {
     /* tighter gutters on mobile */
-    @apply mx-auto w-full max-w-6xl px-2 sm:px-4;
+    @apply mx-auto w-full max-w-6xl px-3 sm:px-4;
   }
 
   .panel {
-    background: rgba(var(--panel), 1);
-    border: 1px solid rgba(var(--border), 1);
-    @apply rounded-2xl;
+    background: linear-gradient(180deg, rgba(var(--panel-2), 0.92), rgba(var(--panel), 0.92));
+    border: 1px solid rgba(var(--border), 0.85);
+    border-radius: var(--radius-xl);
   }
 
   .panel-soft {
-    background: rgba(var(--panel-2), 1);
-    border: 1px solid rgba(var(--border), 1);
-    @apply rounded-2xl;
+    background: rgba(var(--panel-2), 0.92);
+    border: 1px solid rgba(var(--border), 0.85);
+    border-radius: var(--radius-xl);
   }
 
   .text-muted {
@@ -61,6 +87,27 @@
   }
 
   .shadow-soft {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    box-shadow:
+      0 18px 60px rgba(0, 0, 0, 0.55),
+      0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  }
+
+  .hairline {
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  }
+
+  .noise {
+    position: relative;
+  }
+
+  .noise:before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    opacity: 0.055;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    border-radius: inherit;
   }
 }

@@ -23,14 +23,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-50 border-b border-[rgba(var(--accent),0.6)] bg-neutral-950/95 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-[rgba(var(--border),0.85)] bg-[rgba(8,9,12,0.72)] backdrop-blur">
         <div className="container-app flex h-14 items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-white">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[rgba(var(--accent),0.15)] text-[rgb(var(--accent))]">
-                m
+            <Link href="/" className="group flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[rgba(var(--border),0.85)] bg-white/5 text-[rgb(var(--accent))] shadow-soft">
+                <span className="text-[13px] font-semibold tracking-tight">a</span>
               </span>
-              Moltbook-Manager
+              <span className="text-sm font-semibold tracking-tight text-white">
+                Agent Manager
+                <span className="ml-2 hidden rounded-full border border-[rgba(var(--border),0.85)] bg-white/5 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white/60 md:inline">
+                  beta
+                </span>
+              </span>
             </Link>
           </div>
 
@@ -41,7 +46,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={n.href}
                 className={
                   "rounded-xl px-3 py-2 text-sm transition " +
-                  (pathname === n.href ? "bg-white/5 text-white" : "text-white/60 hover:bg-white/5 hover:text-white")
+                  (pathname === n.href
+                    ? "bg-white/5 text-white"
+                    : "text-white/65 hover:bg-white/5 hover:text-white")
                 }
               >
                 {n.label}
@@ -51,8 +58,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-2">
             <button
-              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[rgb(var(--border))] bg-white/5 text-white/70 hover:bg-white/10"
-              aria-label="Search"
+              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(var(--border),0.85)] bg-white/5 text-white/70 hover:bg-white/10"
+              aria-label="Go to dashboard"
               onClick={() => router.push("/dashboard")}
             >
               <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -62,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard"
-                  className="hidden sm:flex items-center gap-2 rounded-xl border border-[rgb(var(--border))] bg-white/5 px-3 py-2 text-sm text-white/75 hover:bg-white/10"
+                  className="hidden sm:flex items-center gap-2 rounded-xl border border-[rgba(var(--border),0.85)] bg-white/5 px-3 py-2 text-sm text-white/75 hover:bg-white/10"
                 >
                   <FontAwesomeIcon icon={faUser} />
                   <span className="max-w-[160px] truncate">{label ?? "Connected"}</span>
@@ -80,8 +87,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </Button>
               </div>
             ) : (
-              <Button variant="outline" size="sm" onClick={() => router.push("/login")}
-                >
+              <Button variant="outline" size="sm" onClick={() => router.push("/login")}>
                 <FontAwesomeIcon icon={faKey} />
                 Connect
               </Button>
@@ -90,9 +96,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="container-app py-8 md:py-10">{children}</main>
+      <main className="container-app py-7 md:py-10 pb-24 md:pb-10">{children}</main>
 
-      <footer className="border-t border-white/10 py-8">
+      {/* Mobile nav (simple + reliable) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[rgba(var(--border),0.85)] bg-[rgba(8,9,12,0.72)] backdrop-blur md:hidden">
+        <div className="container-app grid grid-cols-4 gap-2 py-2">
+          {NAV.map((n) => (
+            <Link
+              key={n.href}
+              href={n.href}
+              className={
+                "flex flex-col items-center justify-center rounded-xl px-2 py-2 text-[11px] transition " +
+                (pathname === n.href ? "bg-white/5 text-white" : "text-white/65 hover:bg-white/5 hover:text-white")
+              }
+            >
+              <span className="mt-0.5">{n.label}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      <footer className="border-t border-white/10 py-8 hidden md:block">
         <div className="container-app text-xs text-white/45">
           API keys are stored only in your browser storage (no database). Use session mode on shared devices.
         </div>
