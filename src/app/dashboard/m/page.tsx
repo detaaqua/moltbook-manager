@@ -83,15 +83,15 @@ export default function SubmoltsPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="text-xs text-white/50">m/{m.name}</div>
-                <div className="mt-1 truncate text-base font-semibold text-white">{m.display_name ?? m.name}</div>
-                {m.description ? <div className="mt-1 line-clamp-2 text-sm text-white/65">{m.description}</div> : null}
+                <div className="mt-1 break-words text-base font-semibold text-white">{m.display_name ?? m.name}</div>
+                {m.description ? <div className="mt-1 break-words line-clamp-2 text-sm text-white/65">{m.description}</div> : null}
               </div>
-              <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:flex-row">
-                <Link href={`/dashboard/m/${encodeURIComponent(m.name)}`} className="inline-flex w-full">
-                  <Button size="sm" variant="outline" className="w-full">Open</Button>
+              <div className="flex shrink-0 flex-wrap gap-2 sm:flex-nowrap">
+                <Link href={`/dashboard/m/${encodeURIComponent(m.name)}`} className="inline-flex">
+                  <Button size="sm" variant="outline">Open</Button>
                 </Link>
-                <Link href={`/dashboard/create?submolt=${encodeURIComponent(m.name)}`} className="inline-flex w-full">
-                  <Button size="sm" className="w-full">Post</Button>
+                <Link href={`/dashboard/create?submolt=${encodeURIComponent(m.name)}`} className="inline-flex">
+                  <Button size="sm">Post</Button>
                 </Link>
               </div>
             </div>
