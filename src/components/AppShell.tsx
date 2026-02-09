@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faKey, faRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons";
@@ -18,15 +17,9 @@ const NAV = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [connected, setConnected] = useState(false);
-  const [label, setLabel] = useState<string | null>(null);
 
-  useEffect(() => {
-    const k = getApiKey();
-    setConnected(!!k);
-    const acc = getActiveAccount();
-    setLabel(acc?.label ?? null);
-  }, [pathname]);
+  const connected = typeof window !== "undefined" && !!getApiKey();
+  const label = typeof window !== "undefined" ? getActiveAccount()?.label ?? null : null;
 
   return (
     <div className="min-h-dvh">
@@ -76,8 +69,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   size="sm"
                   onClick={() => {
                     clearAll();
-                    setConnected(false);
-                    setLabel(null);
                     router.push("/login");
                   }}
                 >
