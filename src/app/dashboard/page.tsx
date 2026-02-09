@@ -106,13 +106,11 @@ export default function DashboardPage() {
     if (!apiKey) return;
     refreshStatus();
     refreshPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey]);
 
   useEffect(() => {
     if (!apiKey) return;
     refreshPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);
 
   const statusBadge = useMemo(() => {

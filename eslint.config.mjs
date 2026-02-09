@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // This app intentionally keeps state in browser storage (no DB).
+      // Relax exhaustive-deps to avoid noisy warnings on intentionally stable effects.
+      "react-hooks/exhaustive-deps": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

@@ -4,18 +4,44 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { clearApiKey, getApiKey } from "@/lib/storage";
-import { useEffect, useState } from "react";
+import {
+  clearAll,
+  getActiveAccount,
+  getApiKey,
+  listAccounts,
+  removeAccount,
+  setActiveAccountId,
+} from "@/lib/storage";
+import { useEffect, useMemo, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+function toastSafe() {
+  // no-op; keeping UX simple without extra toasts in nav.
+}
 
 export function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [authed, setAuthed] = useState(() => !!getApiKey());
+  const [tick, setTick] = useState(0);
+
+  // Recompute when we manually bump `tick` after account changes.
+  const active = useMemo(() => getActiveAccount(), [tick]);
+  const accounts = useMemo(() => listAccounts(), [tick]);
 
   useEffect(() => {
-    const onStorage = () => setAuthed(!!getApiKey());
+    const onStorage = () => {
+      setAuthed(!!getApiKey());
+      setTick((x) => x + 1);
+    };
     window.addEventListener("storage", onStorage);
-    // also update after navigation
     onStorage();
     return () => window.removeEventListener("storage", onStorage);
   }, [pathname]);
@@ -44,17 +70,61 @@ export function TopNav() {
           </Button>
 
           {authed ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                clearApiKey();
-                setAuthed(false);
-                router.push("/login");
-              }}
-            >
-              Logout
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline">
+                  {active?.label || "Account"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Accounts</DropdownMenuLabel>
+                {accounts.length ? (
+                  accounts.map((a) => (
+                    <DropdownMenuItem
+                      key={a.id}
+                      onClick={() => {
+                        setActiveAccountId(a.id);
+                        setTick((x) => x + 1);
+                        toastSafe();
+                      }}
+                    >
+                      <span className="truncate">{a.label}</span>
+                      {active?.id === a.id ? <span className="ml-auto text-xs text-muted-foreground">active</span> : null}
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem onClick={() => router.push("/login")}>Add an account</DropdownMenuItem>
+                )}
+
+                <DropdownMenuSeparator />
+
+                {active ? (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      removeAccount(active.id);
+                      setTick((x) => x + 1);
+                      router.push("/login");
+                    }}
+                  >
+                    Remove active account
+                  </DropdownMenuItem>
+                ) : null}
+
+                <DropdownMenuItem onClick={() => router.push("/login")}>Add another account</DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    clearAll();
+                    setAuthed(false);
+                    router.push("/login");
+                  }}
+                >
+                  Logout (clear all)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : null}
         </nav>
       </div>

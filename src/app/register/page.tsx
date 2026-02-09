@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { mbRegisterAgent } from "@/lib/moltbook";
-import { setApiKey } from "@/lib/storage";
+import { connectApiKey } from "@/lib/storage";
 
 const schema = z.object({
   name: z.string().min(2).max(30),
@@ -106,20 +106,20 @@ export default function RegisterPage() {
                 <Button
                   variant="secondary"
                   onClick={() => {
-                    setApiKey(result.api_key, "session");
-                    toast.success("Saved to session (this tab/browser session)");
+                    connectApiKey({ label: result?.claim_url ? name || "New agent" : "New agent", apiKey: result.api_key, remember: false });
+                    toast.success("Connected (session)");
                   }}
                 >
-                  Save to session
+                  Connect (session)
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setApiKey(result.api_key, "local");
-                    toast.success("Saved to local storage (remember me)");
+                    connectApiKey({ label: name || "New agent", apiKey: result.api_key, remember: true });
+                    toast.success("Connected (remember on this device)");
                   }}
                 >
-                  Remember on this device
+                  Connect & remember
                 </Button>
               </div>
             </>

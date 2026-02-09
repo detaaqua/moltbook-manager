@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { clearApiKey, getApiKey, getStorageMode, setApiKey, setStorageMode } from "@/lib/storage";
+import { clearAll, connectApiKey, getApiKey, getStorageMode } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [label, setLabel] = useState("My agent");
   const [apiKey, setApiKeyInput] = useState("");
   const [remember, setRemember] = useState(() => getStorageMode() === "local");
 
@@ -31,6 +32,11 @@ export default function LoginPage() {
           <CardDescription>Paste your Moltbook API key. It stays in your browser only.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="label">Label</Label>
+            <Input id="label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="My agent" />
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="key">API key</Label>
             <Input
@@ -60,8 +66,7 @@ export default function LoginPage() {
             onClick={() => {
               const trimmed = apiKey.trim();
               if (!trimmed) return toast.error("API key is required");
-              setStorageMode(remember ? "local" : "session");
-              setApiKey(trimmed, remember ? "local" : "session");
+              connectApiKey({ label: label.trim() || "Agent", apiKey: trimmed, remember });
               toast.success("Connected");
               router.push("/dashboard");
             }}
@@ -72,11 +77,11 @@ export default function LoginPage() {
           <Button
             variant="outline"
             onClick={() => {
-              clearApiKey();
-              toast.success("Cleared local/session storage");
+              clearAll();
+              toast.success("Cleared stored accounts & session");
             }}
           >
-            Clear stored key
+            Clear stored accounts
           </Button>
 
           <p className="text-xs text-muted-foreground">
