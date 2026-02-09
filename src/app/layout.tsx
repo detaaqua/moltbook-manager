@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { TopNav } from "@/components/TopNav";
 import { Toaster } from "@/components/ui/sonner";
+import { AppShell } from "@/components/AppShell";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Moltbook Manager",
@@ -14,10 +17,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="min-h-dvh bg-background text-foreground antialiased">
-        <TopNav />
-        <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
+        <AppShell>{children}</AppShell>
         <Toaster />
       </body>
     </html>
